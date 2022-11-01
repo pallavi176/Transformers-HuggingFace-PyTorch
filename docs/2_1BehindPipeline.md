@@ -20,7 +20,7 @@ raw_inputs = [
     "I've been waiting for a HuggingFace course my whole life.",
     "I hate this so much!",
 ]
-inputs = tokenizer(raw_inputs, padding=True, truncation=True, return_tensors="tf") #return_tensors: To specify the type of tensors we want to get back 
+inputs = tokenizer(raw_inputs, padding=True, truncation=True, return_tensors="pt") #return_tensors: To specify the type of tensors we want to get back 
 # truncation=True, Any sentence longer than the maximum the model can handle is truncated
 print(inputs)
 ```
