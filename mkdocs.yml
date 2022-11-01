@@ -1,5 +1,5 @@
 # Project information
-site_name: Transformers-HuggingFace-with-docs
+site_name: Transformers-HuggingFace-PyTorch
 
 # define TOC or order of website-
 nav:
@@ -22,8 +22,8 @@ site_description: >-
   DESCRIPTION
 
 # Repository
-repo_name: pallavi176/Transformers-HuggingFace-with-docs
-repo_url: https://github.com/pallavi176/Transformers-HuggingFace-with-docs
+repo_name: pallavi176/Transformers-HuggingFace-PyTorch
+repo_url: https://github.com/pallavi176/Transformers-HuggingFace-PyTorch
 
 # Configuration
 theme:
@@ -55,7 +55,7 @@ theme:
 extra:
   social:
     - icon: fontawesome/brands/github-alt
-      link: https://github.dev/pallavi176
+      link: https://github.com/pallavi176
     - icon: fontawesome/brands/twitter
       link: https://github.dev/pallavi176
     - icon: fontawesome/brands/linkedin

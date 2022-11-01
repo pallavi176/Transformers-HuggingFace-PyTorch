@@ -1,6 +1,6 @@
 pandas
 mkdocs-material
-tensorflow
+torch
 datasets
 evaluate
 transformers[sentencepiece]

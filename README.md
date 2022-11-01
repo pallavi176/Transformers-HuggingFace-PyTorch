@@ -1,5 +1,5 @@
-# Transformers-HuggingFace-with-docs
-Transformers-HuggingFace-with-docs
+# Transformers-HuggingFace-PyTorch
+Transformers-HuggingFace-PyTorch
 
 ## STEPS -
 
