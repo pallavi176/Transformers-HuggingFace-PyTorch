@@ -30,14 +30,14 @@ print(inputs)
     -> attention mask indicates where padding has been applied, so the model does not pay attention to it.
 
 ## Going through the model
-    -> Pretrained model can be downloaded similarly as tokenizer using TFAutoModel class.
-    -> TFAutoModel class loads a model without its pretraining head.
+    -> Pretrained model can be downloaded similarly as tokenizer using AutoModel class.
+    -> AutoModel class loads a model without its pretraining head.
 
 ``` py
-from transformers import TFAutoModel
+from transformers import AutoModel
 
 checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
-model = TFAutoModel.from_pretrained(checkpoint) # downloads configuration of the model as well as pre-trained weights, only initantiates the body of the model
+model = AutoModel.from_pretrained(checkpoint) # downloads configuration of the model as well as pre-trained weights, only initantiates the body of the model
 # downloaded same checkpoint used in pipeline(cached already) and instantiated a model with it
 ```
 
@@ -53,8 +53,9 @@ model = TFAutoModel.from_pretrained(checkpoint) # downloads configuration of the
 - It is said to be “high dimensional” because of the last value. The hidden size can be very large (768 is common for smaller models, and in larger models this can reach 3072 or more).
 
 ``` py
-outputs = model(inputs)
+outputs = model(**inputs)
 print(outputs.last_hidden_state.shape)
+# torch.Size([2, 16, 768])
 ```
 
 - Note that the outputs of Transformers models behave like namedtuples or dictionaries. You can access the elements by attributes (like we did) or by key (outputs["last_hidden_state"]), or even by index if you know exactly where the thing you are looking for is (outputs[0]).
@@ -71,14 +72,15 @@ print(outputs.last_hidden_state.shape)
     - *ForSequenceClassification
     - *ForTokenClassification, etc
 
-- For our example, we will need a model with a sequence classification head (to be able to classify the sentences as positive or negative). So, we won’t actually use the TFAutoModel class, but TFAutoModelForSequenceClassification:
+- For our example, we will need a model with a sequence classification head (to be able to classify the sentences as positive or negative). So, we won’t actually use the AutoModel class, but AutoModelForSequenceClassification:
 
 ``` py
-from transformers import TFAutoModelForSequenceClassification
+from transformers import AutoModelForSequenceClassification
 checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
-model = TFAutoModelForSequenceClassification.from_pretrained(checkpoint)
-outputs = model(inputs)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+outputs = model(**inputs)
 print(outputs.logits.shape)
+# torch.Size([2, 2])
 ```
 - Now if we look at the shape of our inputs, the dimensionality will be much lower: the model head takes as input the high-dimensional vectors we saw before, and outputs vectors containing two values (one per label):
     - Since we have just two sentences and two labels, the result we get from our model is of shape 2 x 2.
@@ -92,8 +94,8 @@ print(outputs.logits)
 - logits are raw, unnormalized scores outputted by the last layer of the model. - To be converted to probabilities, they need to go through a SoftMax layer (all Transformers models output the logits, as the loss function for training will generally fuse the last activation function, such as SoftMax, with the actual loss function, such as cross entropy)
 
 ``` py
-import tensorflow as tf
-predictions = tf.math.softmax(outputs.logits, axis=-1)
+import torch
+predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
 print(predictions)
 ```
 
@@ -102,8 +104,5 @@ print(predictions)
 
 ``` py
 model.config.id2label
-```
-
-```
-{0: 'NEGATIVE', 1: 'POSITIVE'}
+# {0: 'NEGATIVE', 1: 'POSITIVE'}
 ```
