@@ -16,13 +16,16 @@ tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 sequence = "I've been waiting for a HuggingFace course my whole life."
 model_inputs = tokenizer(sequence)
 ```
+- Here, the model_inputs variable contains everything that’s necessary for a model to operate well.
 
+- tokenize a single sequence:
 ``` py
 # tokenize a single sequence
 sequence = "I've been waiting for a HuggingFace course my whole life."
 model_inputs = tokenizer(sequence)
 ```
 
+- tokenize multiple sequences at a time:
 ``` py
 # tokenize multiple sequences at a time
 sequences = ["I've been waiting for a HuggingFace course my whole life.", "So have I!"]
@@ -78,6 +81,8 @@ print(ids)
 # decode the tokens
 print(tokenizer.decode(model_inputs["input_ids"]))
 print(tokenizer.decode(ids))
+# "[CLS] i've been waiting for a huggingface course my whole life. [SEP]"
+# "i've been waiting for a huggingface course my whole life."
 ```
 
 - The tokenizer added the special word [CLS] at the beginning and the special word [SEP] at the end.
@@ -89,12 +94,12 @@ print(tokenizer.decode(ids))
 - one final time how it can handle multiple sequences (padding!), very long sequences (truncation!), and multiple types of tensors with its main API:
 
 ``` py
-import tensorflow as tf
-from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = TFAutoModelForSequenceClassification.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 sequences = ["I've been waiting for a HuggingFace course my whole life.", "So have I!"]
-tokens = tokenizer(sequences, padding=True, truncation=True, return_tensors="tf")
+tokens = tokenizer(sequences, padding=True, truncation=True, return_tensors="pt")
 output = model(**tokens)
 ```
