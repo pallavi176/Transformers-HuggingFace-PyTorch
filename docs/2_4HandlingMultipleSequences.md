@@ -1,6 +1,7 @@
 # Handling multiple sequences
 
 ## Batching inputs together:
+
 - Sentences we want to group inside a batch will often have different lengths
 
 ``` py
@@ -20,23 +21,24 @@ print(ids[1])
 #[1045, 5223, 2023, 1012]
 ```
 
-- You can't build a tensor with lists of different lengths
+- You can't build a tensor with lists of different lengths 
+- because all arrays and tensors should be rectangular
 
 ``` py
-import tensorflow as tf
+import torch
 ids = [[1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012],
        [1045, 5223, 2023, 1012]]
-input_ids = tf.convert_to_tensor(ids) # Error: not a rectangualr shape
+input_ids = torch.tensor(ids) # ValueError: expected sequence of length 14 at dim 1 (got 4)
 ```
 
 - Generally, we only truncate sentences when they are longer than the maximum length the model can handle
 - Which is why we usually pad the smaller sentences to the length of the longest one!
 
 ``` py
-import tensorflow as tf
+import torch
 ids = [[1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012],
        [1045, 5223, 2023, 1012,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0]]
-input_ids = tf.convert_to_tensor(ids)
+input_ids = torch.tensor(ids)
 input_ids
 ```
 
@@ -50,16 +52,16 @@ tokenizer.pad_token_id      # Applying padding here
 - But just passing this through a transformers model will not give the right results.
 
 ``` py
-from transformers import TFAutoModelForSequenceClassification
-ids1 = tf.convert_to_tensor(
+from transformers import AutoModelForSequenceClassification
+ids1 = torch.tensor(
     [[1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012]]
 )
-ids2 = tf.convert_to_tensor([[1045, 5223, 2023, 1012]])
-all_ids = tf.convert_to_tensor(
+ids2 = torch.tensor([[1045, 5223, 2023, 1012]])
+all_ids = torch.tensor(
     [[1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012],
      [1045, 5223, 2023, 1012,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0]]
 )
-model = TFAutoModelForSequenceClassification.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 print(model(ids1).logits)
 print(model(ids2).logits)
 print(model(all_ids).logits)
@@ -78,12 +80,12 @@ tensor([[-2.7276,  2.8789],
 - To tell the attention layers to ignore the padding tokens, we need to pass them an attention mask.
 
 ``` py
-all_ids = tf.convert_to_tensor(
+all_ids = torch.tensor(
     [[1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012],
      [1045, 5223, 2023, 1012,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0]]
 )
 # adding attention by creating attention mask
-attention_mask = tf.convert_to_tensor(
+attention_mask = torch.tensor(
     [[   1,    1,    1,    1,    1,    1,    1,     1,     1,    1,    1,    1,    1,    1],
      [   1,    1,    1,    1,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0]]
 )
@@ -94,7 +96,7 @@ attention_mask = tf.convert_to_tensor(
 - With the proper attention mask, predictions are the same for a given sentence, with or without padding.
 
 ``` py
-model = TFAutoModelForSequenceClassification.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 output1 = model(ids1)
 output2 = model(ids2)
 print(output1.logits)
@@ -107,7 +109,6 @@ print(output.logits)
 
 ``` py
 from transformers import AutoTokenizer
-
 checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 sentences = [
@@ -115,4 +116,6 @@ sentences = [
     "I hate this.",
 ]
 print(tokenizer(sentences, padding=True))
+# {'input_ids': [[101, 1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012, 102], [101, 1045, 5223, 2023, 1012, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]], 
+# 'attention_mask': [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]}
 ```
