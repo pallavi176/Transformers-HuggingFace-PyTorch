@@ -1,4 +1,5 @@
 # Tokenizers:
+
 - In NLP, most of the data we handle is raw text.
 - Tokenizers is used to transform raw text to numbers.
 - Tokenizer's objective is to find a meaningful representation.
@@ -8,6 +9,7 @@
     - Subword-based
 
 ## Word-based
+
 - The text is split on spaces
 - Other rules, such as punctuation, may be added
 - In this algorithm, each word has a specific ID/number attributed to it
@@ -27,6 +29,7 @@ print(tokenized_text)
 ```
 
 ## Character-based
+
 - Splitting a raw text into characters
 - Character-based vocabularies are slimmer
 - There are much fewer out-of-vocabulary (unknown) tokens, since every word can be built from characters.
@@ -37,6 +40,7 @@ print(tokenized_text)
     - less meaningful individual tokens
 
 ## Subword tokenization
+
 - Splitting a raw text into subwords
 - Finding a middle ground between word and character-based algorithms
 - Subword-based tokenization lies between character and worf-based algorithm
@@ -53,6 +57,7 @@ print(tokenized_text)
 - They keep meaning across very similar words by recognizing similar tokens making them up.
 
 ## Tokenizer Pipeline
+
 - A tokenizer takes texts as inputs and outputs numbers the associated model can make sense of
 
 ``` py
@@ -67,7 +72,7 @@ print(inputs)
 1. Tokenization pipeline: from input text to a list of numbers:
 
     1. Raw text: Let's try to tokenize!
-    2. Tokens: [let,',s, try, to, token, ##ize,!]
+    2. Tokens: [let, ', s, try, to, token, ##ize, !]
     3. Special tokens: [[CLS],let,',s, try, to, token, ##ize,!,[SEP]]
     4. Input IDs: [101, 2292, 1005, 1055, 3046, 2000, 19204, 4697, 999, 102]
 
@@ -93,7 +98,7 @@ print(tokens)
 #[_let, ', s, _try, _to, _to, ken, ize, !]
 ```
 
-- The second step of the tokenization pipeline is to map those tokens to their respective ids as defined by the vocabulary of the tokenizer.
+- The second step of the tokenization pipeline is to map those tokens to their respective input ids as defined by the vocabulary of the tokenizer.
 - This is why we need to download the file when we instantiate a tokenizer with from_pretrained() method. We have to make sure we use the same mapping as when the model was pretrained. To do this, we use convert_tokens_to_ids() method:
 
 ``` py
@@ -115,6 +120,7 @@ print(final_inputs)
 ```
 
 ## Decoding
+
 - The decode method allows us to check how the final output of the tokenizer translates back into text.
 
 ``` py
