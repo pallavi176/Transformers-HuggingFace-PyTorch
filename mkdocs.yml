@@ -16,6 +16,7 @@ nav:
     - 3FineTuningPretrainedModel.md
     - Processing Data: 3_1ProcessingData.md
     - Fine-Tuning A Model with Keras: 3_2ModelFineTuningWithKeras.md
+    - Full Training: 3_3FullTraining.md
 
 site_author: Pallavi Saxena
 site_description: >-
