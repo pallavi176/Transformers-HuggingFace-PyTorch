@@ -1,27 +1,28 @@
 # Processing the data
 
-- Train a sequence classifier on one batch in TensorFlow:
+- Train a sequence classifier on one batch in PyTorch:
 
 ``` py
-import tensorflow as tf
-import numpy as np
-from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
+import torch
+from transformers import AdamW, AutoTokenizer, AutoModelForSequenceClassification
 # Same as before
 checkpoint = "bert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-model = TFAutoModelForSequenceClassification.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 sequences = [
     "I've been waiting for a HuggingFace course my whole life.",
     "This course is amazing!",
 ]
-batch = dict(tokenizer(sequences, padding=True, truncation=True, return_tensors="tf"))
+batch = tokenizer(sequences, padding=True, truncation=True, return_tensors="pt")
 # This is new
-model.compile(optimizer="adam", loss="sparse_categorical_crossentropy")
-labels = tf.convert_to_tensor([1, 1])
-model.train_on_batch(batch, labels)
+batch["labels"] = torch.tensor([1, 1])
+optimizer = AdamW(model.parameters())
+loss = model(**batch).loss
+loss.backward()
+optimizer.step()
 ```
 - Better accuracy required bigger dataset.
-- Dataset used: MRPC (Microsoft Research Paraphrase Corpus) dataset, introduced in [paper](https://aclanthology.org/I05-5002.pdf) 
+- Dataset used below: MRPC (Microsoft Research Paraphrase Corpus) dataset, introduced in [paper](https://aclanthology.org/I05-5002.pdf) 
 - The dataset consists of 5,801 pairs of sentences, with a label indicating if they are paraphrases or not (i.e., if both sentences mean the same thing).
 
 ## Loading a dataset from the Hub
@@ -39,26 +40,33 @@ raw_datasets
 ```
 
 - It returns a DatasetDict object which is a sort of dictionary containing each split(train,validation & test set) of the dataset.
+- This command downloads and caches the dataset, by default in ~/.cache/huggingface/datasets. 
+
 - We can access any split of dataset by its key, then any element by index.
 
 ``` py
 raw_datasets["train"]
 ```
-
 - Each of the splits contains several columns (sentence1, sentence2, label, and idx) and a variable number of rows, which are the number of elements in each set (so, there are 3,668 pairs of sentences in the training set, 408 in the validation set, and 1,725 in the test set).
+
 - We can access en element(s) by indexing:
 
 ``` py
 raw_datasets["train"][6]
 raw_datasets["train"][:5]
 ```
+- We can also directly get a slice of our dataset.
 
-- We can also directly get a slice of your dataset.
 - The features attributes gives us more information about each column. It gives corresponds between integer and names for tha labels.
 
 ``` py
 raw_datasets["train"].features
+{'sentence1': Value(dtype='string', id=None),
+ 'sentence2': Value(dtype='string', id=None),
+ 'label': ClassLabel(num_classes=2, names=['not_equivalent', 'equivalent'], names_file=None, id=None),
+ 'idx': Value(dtype='int32', id=None)}
 ```
+- label is of type ClassLabel, and the mapping of integers to label name is stored in the names folder. 0 corresponds to not_equivalent, and 1 corresponds to equivalent.
 
 - The map method allows you to apply a function over all the splits of a given dataset.
 
@@ -75,7 +83,8 @@ print(tokenized_datasets.column_names)
 ```
 
 - As long as the function returns a dictionary like object, the map() method will add new columns as needed or update existing ones.
-- Result of tokenize_function(): ['attention_mask', 'idx', 'input_ids', 'label', 'sentence1', 'sentence2', 'token_type_ids']
+- Result of tokenize_function(): ['attention_mask', 'idx', 'input_ids', 'label', 'sentence1', 'sentence2', 'token_type_ids'].
+
 - You can preprocess faster by using the option batched=True. The applied function will then receive multiple examples at each call.
 
 ``` py
@@ -87,9 +96,10 @@ def tokenize_function(examples):
         examples["sentence1"], examples["sentence2"], padding="max_length", truncation=True, max_length=128
     )
 tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
+print(tokenized_datasets.column_names)
 ```
 
-- We can aslo use multiprocessing with a map method.
+- We can also use multiprocessing with a map method.
 - With just a few last tweaks, the dataset is then ready for training!
 - We just remove the columns we don't need anymore with the remove column methods, rename label to labels since the model from transformers library expect that and set the output format to desired backend torch, tensorflow or numpy.
 - If needed we can also generate a short sample of dataset using the select method.
@@ -102,10 +112,9 @@ tokenized_datasets["train"]
 small_train_dataset = tokenized_datasets["train"].select(range(100))
 ```
 
-
 ## Preprocessing a dataset
 
-### Preprocessing sentence pairs (TensorFlow)
+### Preprocessing sentence pairs (PyTorch)
 
 - We have seen before how to tokenize single sentences and batch them together.
 
@@ -117,7 +126,7 @@ sequences = [
     "I've been waiting for a HuggingFace course my whole life.",
     "This course is amazing!",
 ]
-batch = tokenizer(sequences, padding=True, truncation=True, return_tensors="tf")
+batch = tokenizer(sequences, padding=True, truncation=True, return_tensors="pt")
 ```
 
 - But text classification can also be applied on pairs of sentences. 
@@ -137,6 +146,8 @@ tokenizer("My name is Pallavi Saxena.", "I work at Avalara.")
 
 - It returns a new field called "token_type_ids" which tells the model which tokens belong to the first sentence and which ones belong to the second sentence.
 - The tokenizer adds special tokens for the corresponding model and prepares "token_type_ids" to indicate which part of the inputs correspond to which sentence.
+- the parts of the input corresponding to [CLS] sentence1 [SEP] all have a token type ID of 0, while the other parts, corresponding to sentence2 [SEP], all have a token type ID of 1.
+
 - To process several pairs of sentences together, just pass the list of first sentences followed by the list of second sentences.
 
 ``` py
@@ -154,21 +165,23 @@ tokenizer(
 - Those inputs are then ready to go through a sequence classification model!
 
 ``` py
-from transformers import TFAutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 checkpoint = "bert-base-uncased"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 batch = tokenizer(
     ["My name is Pallavi Saxena.", "Going to the cinema."],
     ["I work at Avalara.", "This movie is great."],
     padding=True,
-    return_tensors="tf",
+    return_tensors="pt",
 )
-model = TFAutoModelForSequenceClassification.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 outputs = model(**batch)
 ```
 
-- All model checkpoint layers were used when initializing TFBertForSequenceClassification.
-- Some layers of TFBertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier']
+- Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: ['cls.seq_relationship.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.seq_relationship.bias', 'cls.predictions.bias']
+    - This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+    - This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+- Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.bias', 'classifier.weight']
 - You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 
 ## Dynamic padding
@@ -217,7 +230,7 @@ raw_datasets = load_dataset("glue", "mrpc")
 checkpoint = "bert-base-cased"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 def tokenize_function(examples):
-    return tokenizer(examples["sentence1"], examples["sentence2"], truncation=True)
+    return tokenizer(examples["sentence1"], examples["sentence2"], truncation=True)   # removed padding from here
 tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
 tokenized_datasets = tokenized_datasets.remove_columns(["idx", "sentence1", "sentence2"])
 tokenized_datasets = tokenized_datasets.rename_column("label", "labels")
@@ -229,7 +242,8 @@ tokenized_datasets = tokenized_datasets.with_format("torch")
 ``` py
 from torch.utils.data import DataLoader
 from transformers import DataCollatorWithPadding
-data_collator = DataCollatorWithPadding(tokenizer)
+
+data_collator = DataCollatorWithPadding(tokenizer)   # applying padding her for dynamic padding
 train_dataloader = DataLoader(
     tokenized_datasets["train"], batch_size=16, shuffle=True, collate_fn=data_collator
 )
