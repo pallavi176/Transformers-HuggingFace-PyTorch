@@ -19,6 +19,7 @@ nav:
     - Full Training: 3_3FullTraining.md
   - SharingModelsAndTokenizers
     - 4HuggingFaceHub.md
+    - Using Pretrained Models: 4_1UsingPretrainedModels.md
 
 
 site_author: Pallavi Saxena
