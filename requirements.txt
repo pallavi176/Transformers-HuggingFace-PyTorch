@@ -5,3 +5,4 @@ torch
 datasets
 evaluate
 transformers[sentencepiece]
+accelerate
