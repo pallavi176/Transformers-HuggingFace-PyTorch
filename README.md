@@ -49,3 +49,7 @@ https://squidfunk.github.io/mkdocs-material/creating-your-site/
 ```bash
 pip install ipykernel
 ```
+
+Adam with a twist for weight decay regularization:
+[Decoupled Weight Decay Regularization](https://arxiv.org/abs/1711.05101)
+
