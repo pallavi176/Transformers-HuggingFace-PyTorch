@@ -20,6 +20,7 @@ nav:
   - SharingModelsAndTokenizers
     - 4HuggingFaceHub.md
     - Using Pretrained Models: 4_1UsingPretrainedModels.md
+    - Sharing Pretrained Models: 4_2SharingPretrainedModels.md
 
 
 site_author: Pallavi Saxena
