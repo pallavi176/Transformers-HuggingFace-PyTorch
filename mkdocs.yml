@@ -15,9 +15,9 @@ nav:
   - FineTuningPretrainedModel: 
     - 3FineTuningPretrainedModel.md
     - Processing Data: 3_1ProcessingData.md
-    - Fine-Tuning A Model with Keras: 3_2ModelFineTuningWithKeras.md
+    - Fine-Tuning A Model with Trainer API: 3_2ModelFineTuningWithTrainerAPI.md
     - Full Training: 3_3FullTraining.md
-  - SharingModelsAndTokenizers
+  - SharingModelsAndTokenizers:
     - 4HuggingFaceHub.md
     - Using Pretrained Models: 4_1UsingPretrainedModels.md
     - Sharing Pretrained Models: 4_2SharingPretrainedModels.md
