@@ -53,3 +53,6 @@ pip install ipykernel
 Adam with a twist for weight decay regularization:
 [Decoupled Weight Decay Regularization](https://arxiv.org/abs/1711.05101)
 
+### Repository class
+https://github.com/huggingface/huggingface_hub/tree/main/src/huggingface_hub#advanced-programmatic-repository-management
+
