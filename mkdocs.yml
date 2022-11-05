@@ -24,6 +24,7 @@ nav:
     - Building a Model Card: 4_3BuildingModelCard.md
   - HuggingFaceDatasetsLibrary:
     - 5HuggingFaceDatasetsLibrary.md
+    - Loading Custom Datasets: 5_1LoadCustomDataset.md
 
 
 site_author: Pallavi Saxena
