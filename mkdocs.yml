@@ -25,6 +25,7 @@ nav:
   - HuggingFaceDatasetsLibrary:
     - 5HuggingFaceDatasetsLibrary.md
     - Loading Custom Datasets: 5_1LoadCustomDataset.md
+    - Slice And Dice a Dataset: 5_2SliceDiceDataset.md
 
 
 site_author: Pallavi Saxena
