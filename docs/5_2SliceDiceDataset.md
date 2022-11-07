@@ -114,36 +114,79 @@ squad.map(tokenize_title, batched=True, batch_size=500)
 
 ## From Datasets to DataFrames and back
 
+- Although the processing functions of the datasets library will cover most of the cases needed to train a model, there are times when you will need to switch to a library like pandas to access more powerful features or high-level apis for visualizations.
+- Fortunately the datasets library is designed to be inter-operable with libraries like pandas, numpy, pytorch, tensorflow and jax.
+- By default, a Dataset object will return Python objects when you index it.
+
 ``` py
 from datasets import load_dataset
-
 dataset = load_dataset("swiss_judgment_prediction", "all_languages", split="train")
 dataset[0]
 ```
 
-``` py
-
-```
-
-``` py
-
-```
+- but what can you do if you want to ask complex questions about the data?
+- Suppose that before we train any models we would like to explore the data a bit.
+- Explore questions like which legal area is the most common? or How are the languages distributed across regions?
+- Luckily we can use Pandas to answer these questions! Since answering these questions with the native arrow format is not easy.
+- The way this works is that by using the set_format(), we will change the output format of the dataset from python dictionaries to pandas dataframes.
 
 ``` py
-
+# Convert the output format to pandas.DataFrame
+dataset.set_format("pandas")
+dataset[0]
 ```
+
+- the way this words under the hood is that the datasets library changes the magic method __getitem__() of the dataset.
+- the __getitem__() method is a special method for python containers that allows you to specify how indexing works.
+- In this case, the __getitem__() method of the raw dataset starts off by returning a python dictionary and then after applying the set_format() method we change __getitem__() method to return dataframes instead.
 
 ``` py
-
+dataset.__getitem__(0)
+dataset.set_format("pandas")
+dataset.__getitem__(0)
 ```
+
+- Another way to create a Dataframe is with the Dataset.to_pandas() method.
+- The datasets library also provides a to_pandas() method if you want to do the format conversion and slicing of the datset in one go.
 
 ``` py
-
+df = dataset.to_pandas()
+df.head()
 ```
+
+- Once we have a DataFrame, we can query our data, make pretty plots and so on.
 
 ``` py
+# How are languages distributed across regions?
+df.groupby("region")["language"].value_counts()
 
+# Which legal area is most common?
+df["legal area"].value_counts()
 ```
+
+- Just remember to reset the format back to arrow tables when you are finished.
+- If you don't you can run into the problems if you try to tokenize your text, because it is no longer represented as strings in a dictionary
+
+``` py
+from transformers import AutoTokenizer
+
+# Load a pretrained tokenizer
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+# Tokenize the `text` column
+dataset.map(lambda x : tokenizer(x["text"]))
+```
+
+- By resetting the output format, we get back arrow tables and we can tokenize without problems.
+
+``` py
+# Reset back to Arrow format
+dataset.reset_format()
+# Now we can tokenize!
+dataset.map(lambda x : tokenizer(x["text"]))
+```
+
+## Saving a dataset
+
 
 ``` py
 
