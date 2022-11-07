@@ -185,117 +185,117 @@ dataset.reset_format()
 dataset.map(lambda x : tokenizer(x["text"]))
 ```
 
-## Saving a dataset
+## Saving and reloading a dataset
 
+- When you download or process or process a dataset, the processing scripts and data are stored locally in a cache directory.
+- The cache allows the datasets library to avoid re-downloading or processing the entire dataset everytime you use it.
+- Now the data is stored in the form of arrow tables whose location can be found by accessing the dataset's cache_files attribute.
 
 ``` py
-
+from datasets import load_dataset
+raw_datasets = load_dataset("allocine")
+raw_datasets.cache_files
 ```
 
-``` py
+- Alternatively, you can save your dataset in a different location and format.
+- The Datasets library provides 4 main functions to achieve this:
+    - Arrow: Dataset.save_to_disk()
+    - CSV: Dataset.to_csv()
+    - JSON: Dataset.to_json()
+    - Parquet: Dataset.to_parquet()
+- CSV and JSON formats are great if you just want to quickly save a small or medium sized dataset.
+- But if your dataset is huge, you will want to save it in either the arrow or parquet formats.
+- Arrow files are great if you plan to reload or process the data in the near future.
+- While parquet files are designed for long term storage and are very space efficient.
 
+### Arrow format
+
+- When you save in Arrow format, each split and its metadata are stored in a separate directory.
+- Here we provide the path we wish to save the data to and the datasets library will automatically create a directory for each split to store the arrow table and the metadata.
+- Since we are dealing with a dataset dict object that has multiple splits, this information is also stored in the dataset_dict.json file.
+
+``` py
+raw_datasets.save_to_disk("my-arrow-datasets")
+my-arrow-datasets/
+├── dataset_dict.json
+├── test
+│   ├── dataset.arrow
+│   ├── dataset_info.json
+│   └── state.json
+├── train
+│   ├── dataset.arrow
+│   ├── dataset_info.json
+│   ├── indices.arrow
+│   └── state.json
+└── validation
+    ├── dataset.arrow
+    ├── dataset_info.json
+    ├── indices.arrow
+    └── state.json
 ```
 
-``` py
+- To reload a local Arrow dataset, we use the load_from_disk() function.
+- We simply pass the path of our dataset directory and the original dataset will be recovered.
 
+``` py
+from datasets import load_from_disk
+arrow_datasets_reloaded = load_from_disk("my-arrow-datasets")
+arrow_datasets_reloaded
 ```
 
-``` py
+### CSV Format
 
+- To save a dataset in CSV format, we save each split as a separate file.
+- We use to_csv() function.
+- In this case, you will need to loop over the splits of the dataset dict object and save each dataset as an individual csv file.
+- Since the o_csv() function is based on the one from pandas, you can pass keyword arguments to configure the output 
+
+``` py
+for split, dataset in raw_datasets.items():
+    dataset.to_csv(f"my-dataset-{split}.csv", index=None)
 ```
 
-``` py
+- We can then reload the CSV files using the data_files argument, together with the csv loading script and the data files argument which specifies the file names associated with each split 
 
+``` py
+data_files = {
+    "train": "my-dataset-train.csv",
+    "validation": "my-dataset-validation.csv",
+    "test": "my-dataset-test.csv",
+}
+csv_datasets_reloaded = load_dataset("csv", data_files=data_files)
+csv_datasets_reloaded
 ```
 
-``` py
+### JSON & Parquet Formats
 
+- Saving a dataset in JSON and Parquet formats is similar to CSV
+
+``` py
+# Save in JSON Lines format
+for split, dataset in raw_datasets.items():
+    dataset.to_json(f"my-dataset-{split}.jsonl")
+
+# Save in Parquet format
+for split, dataset in raw_datasets.items():
+    dataset.to_parquet(f"my-dataset-{split}.parquet")
 ```
 
-``` py
-
-```
+- We also reload JSON and Parquet files using the data_files argument.
 
 ``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
-```
-
-``` py
-
+json_data_files = {
+    "train": "my-dataset-train.jsonl",
+    "validation": "my-dataset-validation.jsonl",
+    "test": "my-dataset-test.jsonl",
+}
+parquet_data_files = {
+    "train": "my-dataset-train.parquet",
+    "validation": "my-dataset-validation.parquet",
+    "test": "my-dataset-test.parquet",
+}
+# Reload with the `json` script
+json_datasets_reloaded = load_dataset("json", data_files=json_data_files)
+# Reload with the `parquet` script
+parquet_datasets_reloaded = load_dataset("parquet", data_files=parquet_data_files)
 ```
