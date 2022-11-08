@@ -27,6 +27,7 @@ nav:
     - Loading Custom Datasets: 5_1LoadCustomDataset.md
     - Slice And Dice a Dataset: 5_2SliceDiceDataset.md
     - Big Data with Datasets: 5_3BigData.md
+    - Creating Your Own Dataset: 5_4CreatingOwnDataset.md
 
 
 site_author: Pallavi Saxena
