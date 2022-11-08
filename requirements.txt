@@ -8,3 +8,5 @@ evaluate
 transformers[sentencepiece]
 accelerate
 huggingface_hub
+zstandard
+psutil
