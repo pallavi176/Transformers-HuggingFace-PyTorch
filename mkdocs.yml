@@ -28,6 +28,7 @@ nav:
     - Slice And Dice a Dataset: 5_2SliceDiceDataset.md
     - Big Data with Datasets: 5_3BigData.md
     - Creating Your Own Dataset: 5_4CreatingOwnDataset.md
+    - Semantic search with FAISS: 5_5SemanticSearchWithFAISS.md
 
 
 site_author: Pallavi Saxena
