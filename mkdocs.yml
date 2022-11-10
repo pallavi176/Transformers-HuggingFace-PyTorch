@@ -32,6 +32,7 @@ nav:
   - HuggingFaceTokenizersLibrary:
     - 6HuggingFaceTokenizersLibrary.md
     - Training a new tokenizer from an old one: 6_1TrainingNewTokenizerFromOld1.md
+    - Fast tokenizers special powers: 6_2FastTokenizersSpecialPowers.md
 
 
 site_author: Pallavi Saxena
