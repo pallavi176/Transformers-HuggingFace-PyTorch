@@ -37,6 +37,7 @@ nav:
     - Normalization and pre-tokenization: 6_4NormalizationPreTokenization.md
     - Byte-Pair Encoding tokenization: 6_5BytePairEncodingTokenization.md
     - WordPiece tokenization: 6_6WordPieceTokenization.md
+    - Unigram tokenization: 6_7UnigramTokenization.md
 
 
 site_author: Pallavi Saxena
