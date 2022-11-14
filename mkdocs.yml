@@ -36,6 +36,7 @@ nav:
     - Fast tokenizers in QA pipeline: 6_3FastTokenizersInQApipeline.md
     - Normalization and pre-tokenization: 6_4NormalizationPreTokenization.md
     - Byte-Pair Encoding tokenization: 6_5BytePairEncodingTokenization.md
+    - WordPiece tokenization: 6_6WordPieceTokenization.md
 
 
 site_author: Pallavi Saxena
