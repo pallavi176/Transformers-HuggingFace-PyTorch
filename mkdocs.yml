@@ -34,6 +34,7 @@ nav:
     - Training a new tokenizer from an old one: 6_1TrainingNewTokenizerFromOld1.md
     - Fast tokenizers special powers: 6_2FastTokenizersSpecialPowers.md
     - Fast tokenizers in QA pipeline: 6_3FastTokenizersInQApipeline.md
+    - Normalization and pre-tokenization: 6_4NormalizationPreTokenization.md
 
 
 site_author: Pallavi Saxena
