@@ -39,6 +39,8 @@ nav:
     - WordPiece tokenization: 6_6WordPieceTokenization.md
     - Unigram tokenization: 6_7UnigramTokenization.md
     - Building a tokenizer, block by block: 6_8BuildingATokenizer.md
+  - MainNLPTasks:
+    - 7MainNLPTasks.md
 
 
 site_author: Pallavi Saxena
