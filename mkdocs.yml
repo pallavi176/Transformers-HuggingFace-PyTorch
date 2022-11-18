@@ -38,6 +38,7 @@ nav:
     - Byte-Pair Encoding tokenization: 6_5BytePairEncodingTokenization.md
     - WordPiece tokenization: 6_6WordPieceTokenization.md
     - Unigram tokenization: 6_7UnigramTokenization.md
+    - Building a tokenizer, block by block: 6_8BuildingATokenizer.md
 
 
 site_author: Pallavi Saxena
